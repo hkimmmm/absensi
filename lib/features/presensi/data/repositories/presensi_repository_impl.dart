@@ -20,14 +20,31 @@ class PresensiRepositoryImpl implements PresensiRepository {
 
   @override
   Future<Presensi> checkIn(Presensi presensi) async {
-    final model = await remote.checkIn(PresensiModel.fromEntity(presensi));
-    return model.toEntity();
+    try {
+      print(
+          'PresensiRepositoryImpl: checkIn dipanggil dengan presensi: $presensi');
+      final model = await remote.checkIn(PresensiModel.fromEntity(presensi));
+      print('PresensiRepositoryImpl: checkIn berhasil, model: $model');
+      return model.toEntity();
+    } catch (e, stackTrace) {
+      print(
+          'PresensiRepositoryImpl: Error checkIn: $e, StackTrace: $stackTrace');
+      throw Exception('Gagal check-in: $e');
+    }
   }
 
   @override
-  Future<Presensi> checkOut(String presensiId, Presensi presensi) async {
-    final model =
-        await remote.checkOut(presensiId, PresensiModel.fromEntity(presensi));
-    return model.toEntity();
+  Future<Presensi> checkOut(Presensi presensi) async {
+    try {
+      print(
+          'PresensiRepositoryImpl: checkOut dipanggil dengan presensi: $presensi');
+      final model = await remote.checkOut(PresensiModel.fromEntity(presensi));
+      print('PresensiRepositoryImpl: checkOut berhasil, model: $model');
+      return model.toEntity();
+    } catch (e, stackTrace) {
+      print(
+          'PresensiRepositoryImpl: Error checkOut: $e, StackTrace: $stackTrace');
+      throw Exception('Gagal check-out: $e');
+    }
   }
 }

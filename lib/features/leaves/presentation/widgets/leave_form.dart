@@ -47,7 +47,7 @@ class _LeaveFormState extends State<LeaveForm> {
             ),
             value:
                 controller.jenis.value.isEmpty ? null : controller.jenis.value,
-            items: ['cuti', 'sakit', 'dinas']
+            items: ['cuti', 'sakit', 'izin']
                 .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                 .toList(),
             onChanged: (value) => controller.jenis.value = value ?? '',

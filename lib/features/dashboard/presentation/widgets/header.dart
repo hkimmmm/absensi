@@ -5,8 +5,6 @@ class HeaderProfile extends StatelessWidget {
   final String position;
   final String? fotoProfile;
   final VoidCallback? onNotificationPressed;
-  //192.168.230.198
-  //"http://10.137.251.61:3000"
   final String baseUrl = "http://192.168.18.9:3000";
 
   const HeaderProfile({

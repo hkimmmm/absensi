@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:smartelearn/services/presensi_service.dart';
 import '../../domain/entities/presensi_entity.dart';
 import '../../domain/usecases/checkin_usecase.dart';
 import '../../domain/usecases/checkout_usecase.dart';
@@ -34,6 +36,13 @@ class PresensiController extends GetxController {
       presensiList.assignAll(data);
       error.value = null;
       print("Data presensi loaded: ${data.length} items");
+      print("Presensi list: ${data.map((e) => {
+            'id': e.id,
+            'tanggal': e.tanggal?.toString(),
+            'checkinTime': e.checkinTime?.toString(),
+            'checkoutTime': e.checkoutTime?.toString(),
+            'status': e.status
+          }).toList()}");
     } catch (e) {
       error.value = 'Gagal memuat data: ${e.toString()}';
       Get.snackbar('Error', error.value!);
@@ -45,31 +54,67 @@ class PresensiController extends GetxController {
 
   /// Refresh data
   Future<void> refreshData() async {
+    print("Refreshing presensi data...");
     await loadPresensi();
   }
 
-  /// Check-in
   Future<Presensi?> checkIn(Presensi data) async {
+    print('📥 Controller: checkIn called with data: $data');
     try {
+      if (data.batchId == null) {
+        throw PresensiValidationException('batchId wajib diisi');
+      }
+      if (data.status == 'hadir' &&
+          (data.checkinLat == null || data.checkinLng == null)) {
+        throw PresensiValidationException('Lokasi wajib untuk status hadir');
+      }
       final result = await checkInUseCase.call(data);
-      await refreshData(); // Refresh list setelah check-in
+      print('✅ Controller: checkIn successful, result: $result');
+      await refreshData();
       return result;
-    } catch (e) {
-      error.value = 'Gagal check-in: ${e.toString()}';
-      Get.snackbar('Error', error.value!);
+    } catch (e, stackTrace) {
+      error.value =
+          e is PresensiValidationException || e is PresensiServiceException
+              ? e.toString()
+              : 'Gagal check-in: ${e.toString()}';
+      print('❌ Controller: checkIn failed: $e, StackTrace: $stackTrace');
+      Get.snackbar('Error', error.value!, duration: Duration(seconds: 5));
       return null;
     }
   }
 
-  /// Check-out
-  Future<Presensi?> checkOut(String presensiId, Presensi data) async {
+  Future<Presensi?> checkOut(Presensi data) async {
     try {
-      final result = await checkOutUseCase.call(presensiId, data);
-      await refreshData(); // Refresh list setelah check-out
+      if (data.batchId == null) {
+        throw PresensiValidationException('batchId wajib diisi');
+      }
+      if (data.status == 'hadir' &&
+          (data.checkoutLat == null || data.checkoutLng == null)) {
+        throw PresensiValidationException('Lokasi wajib untuk status hadir');
+      }
+      final result = await checkOutUseCase.call(data);
+      await refreshData();
+      Get.snackbar('Sukses', 'Check-out berhasil');
       return result;
-    } catch (e) {
-      error.value = 'Gagal check-out: ${e.toString()}';
-      Get.snackbar('Error', error.value!);
+    } catch (e, stackTrace) {
+      String errorMessage;
+      if (e is PresensiValidationException || e is PresensiServiceException) {
+        errorMessage = e
+            .toString()
+            .replaceAll('PresensiValidationException: ', '')
+            .replaceAll('PresensiServiceException: ', '');
+        if (errorMessage.contains('Tidak ada presensi aktif untuk hari ini')) {
+          errorMessage =
+              'Tidak ada presensi aktif hari ini. Silakan check-in terlebih dahulu.';
+        }
+      } else if (e is UnauthorizedException) {
+        errorMessage = 'Akses tidak diizinkan. Silakan login ulang.';
+      } else {
+        errorMessage = 'Gagal check-out: ${e.toString()}';
+      }
+      error.value = errorMessage;
+      Logger().e('Controller: checkOut failed: $e, StackTrace: $stackTrace');
+      Get.snackbar('Error', errorMessage, duration: Duration(seconds: 5));
       return null;
     }
   }
@@ -82,5 +127,38 @@ class PresensiController extends GetxController {
 
   void _stopLoading() {
     isLoading.value = false;
+  }
+
+  bool get hasActivePresensiToday {
+    final now = DateTime.now().toLocal(); // Ensure local time
+    final result = presensiList.any((presensi) {
+      if (presensi.checkoutTime != null || presensi.tanggal == null) {
+        return false;
+      }
+      final presensiDate = presensi.tanggal!.toLocal(); // Convert to local time
+      final isToday = isSameDay(presensiDate, now);
+      print(
+          'Presensi: id=${presensi.id}, tanggal=$presensiDate, checkoutTime=${presensi.checkoutTime}, IsToday: $isToday');
+      return isToday;
+    });
+    print('hasActivePresensiToday: $result');
+    return result;
+  }
+
+  bool get hasPendingCheckoutFromPreviousDay {
+    final now = DateTime.now().toLocal();
+    return presensiList.any((presensi) {
+      if (presensi.checkoutTime != null || presensi.tanggal == null) {
+        return false;
+      }
+      final presensiDate = presensi.tanggal!.toLocal();
+      return !isSameDay(presensiDate, now);
+    });
+  }
+
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 }

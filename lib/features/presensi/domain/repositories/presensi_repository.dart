@@ -5,5 +5,5 @@ abstract class PresensiRepository {
 
   Future<Presensi> checkIn(Presensi presensi);
 
-  Future<Presensi> checkOut(String presensiId, Presensi presensi);
+  Future<Presensi> checkOut(Presensi presensi);
 }

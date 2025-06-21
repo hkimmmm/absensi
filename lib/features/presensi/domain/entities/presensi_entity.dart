@@ -1,5 +1,5 @@
 class Presensi {
-  final String? id; // Tambahan ID
+  final String? id;
   final DateTime? tanggal;
   final DateTime? checkinTime;
   final double? checkinLat;
@@ -7,7 +7,9 @@ class Presensi {
   final DateTime? checkoutTime;
   final double? checkoutLat;
   final double? checkoutLng;
-  final String status;
+  final String? status; // Ubah menjadi opsional
+  final String? batchId;
+  final String? presensiId; // Tambahkan untuk QR perorangan
 
   Presensi({
     this.id,
@@ -18,13 +20,16 @@ class Presensi {
     this.checkoutTime,
     this.checkoutLat,
     this.checkoutLng,
-    required this.status,
+    this.status,
+    this.batchId,
+    this.presensiId,
   });
 
   factory Presensi.forCheckIn({
     required String status,
     double? checkinLat,
     double? checkinLng,
+    required String batchId,
   }) {
     final wibTime = DateTime.now().toUtc().add(const Duration(hours: 7));
     return Presensi(
@@ -33,6 +38,24 @@ class Presensi {
       checkinLat: checkinLat,
       checkinLng: checkinLng,
       status: status,
+      batchId: batchId,
+    );
+  }
+
+  factory Presensi.forCheckOut({
+    double? checkoutLat,
+    double? checkoutLng,
+    required String batchId,
+    String? presensiId,
+  }) {
+    final wibTime = DateTime.now().toUtc().add(const Duration(hours: 7));
+    return Presensi(
+      tanggal: DateTime(wibTime.year, wibTime.month, wibTime.day),
+      checkoutTime: wibTime,
+      checkoutLat: checkoutLat,
+      checkoutLng: checkoutLng,
+      batchId: batchId,
+      presensiId: presensiId,
     );
   }
 }

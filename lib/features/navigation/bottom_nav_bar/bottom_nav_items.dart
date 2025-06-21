@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 final List<BottomNavigationBarItem> bottomNavItems = [
   const BottomNavigationBarItem(
-    icon: Icon(Icons.dashboard),
-    label: 'Dashboard',
-    tooltip: 'Dashboard',
+    icon: Icon(Icons.home),
+    label: 'Home',
+    tooltip: 'Home',
   ),
   const BottomNavigationBarItem(
     icon: Icon(Icons.calendar_today),
@@ -13,8 +13,8 @@ final List<BottomNavigationBarItem> bottomNavItems = [
   ),
   const BottomNavigationBarItem(
     icon: Icon(Icons.qr_code),
-    label: 'QR Code',
-    tooltip: 'QR Code',
+    label: 'Presence',
+    tooltip: 'Presence',
   ),
   const BottomNavigationBarItem(
     icon: Icon(Icons.person),

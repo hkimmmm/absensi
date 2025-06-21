@@ -2,24 +2,36 @@ import '../../domain/entities/user_info_entity.dart';
 
 class UserInfoModel extends UserInfoEntity {
   UserInfoModel({
-    required super.nama,
-    required super.role,
     required super.fotoProfile,
+    required super.nik,
+    required super.nama,
+    required super.email,
+    required super.noTelp,
+    required super.alamat,
+    required super.role,
   });
 
   factory UserInfoModel.fromJson(Map<String, dynamic> json) {
     return UserInfoModel(
-      nama: json['nama'] ?? '',
-      role: json['role'] ?? '',
       fotoProfile: json['foto_profile'] as String? ?? '',
+      nik: json['nik'] as String? ?? '',
+      nama: json['nama'] ?? '',
+      email: json['email'] ?? '',
+      noTelp: json['no_telepon'] ?? '',
+      alamat: json['alamat'] ?? '',
+      role: json['role'] ?? '',
     );
   }
 
   UserInfoEntity toEntity() {
     return UserInfoEntity(
-      nama: nama,
-      role: role,
       fotoProfile: fotoProfile,
+      nik: nik,
+      nama: nama,
+      email: email,
+      noTelp: noTelp,
+      alamat: alamat,
+      role: role,
     );
   }
 }

@@ -1,25 +1,24 @@
-import './checkin.dart';
-import './checkout.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart'; // Tambahkan ini
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:smartelearn/config/app_routes.dart';
 import 'package:smartelearn/features/navigation/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:smartelearn/features/navigation/controller/bottom_nav_controller.dart';
 import '../controllers/presensi_controller.dart';
+import './checkin.dart';
+import './checkout.dart';
 
 class PresensiPage extends StatelessWidget {
   const PresensiPage({super.key});
 
-  // Inisialisasi lokal di constructor
   Future<void> initLocale() async {
     await initializeDateFormatting('id_ID', null);
   }
 
   String formatDateTime(DateTime? dateTime) {
     if (dateTime == null) return '-';
-    final local = dateTime.toLocal(); // konversi dari UTC ke lokal
+    final local = dateTime.toLocal();
     return '${DateFormat('dd MMM yyyy - HH:mm', 'id_ID').format(local)} WIB';
   }
 
@@ -50,37 +49,40 @@ class PresensiPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Obx(() {
-                  final hasActivePresensi = controller.presensiList
-                      .any((e) => e.checkoutTime == null);
+                  final hasTodayPresensi = controller.hasActivePresensiToday;
 
                   return Row(
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: hasActivePresensi
-                              ? null
-                              : () => Get.to(() => const CheckinPage()),
+                          onPressed: !hasTodayPresensi
+                              ? () => Get.to(() => const CheckinPage())
+                              : null,
                           icon: const Icon(Icons.login),
                           label: const Text('Check-In'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor:
+                                !hasTodayPresensi ? Colors.blue : Colors.grey,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
+                            disabledBackgroundColor: Colors.grey[400],
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: hasActivePresensi
+                          onPressed: hasTodayPresensi
                               ? () => Get.to(() => const CheckoutPage())
                               : null,
                           icon: const Icon(Icons.logout),
                           label: const Text('Check-Out'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
+                            backgroundColor:
+                                hasTodayPresensi ? Colors.red : Colors.grey,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
+                            disabledBackgroundColor: Colors.grey[400],
                           ),
                         ),
                       ),
@@ -117,13 +119,6 @@ class PresensiPage extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final item = controller.presensiList[index];
 
-                        print('Raw checkinTime: ${item.checkinTime}');
-                        print(
-                            'Lokal checkinTime: ${item.checkinTime?.toLocal()}');
-                        print('Raw checkoutTime: ${item.checkoutTime}');
-                        print(
-                            'Lokal checkoutTime: ${item.checkoutTime?.toLocal()}');
-
                         return Card(
                           elevation: 3,
                           shape: RoundedRectangleBorder(
@@ -149,7 +144,7 @@ class PresensiPage extends StatelessWidget {
                               style: const TextStyle(fontSize: 13),
                             ),
                             trailing: Text(
-                              item.status.toUpperCase(),
+                              item.status!.toUpperCase(),
                               style: TextStyle(
                                 color: item.status == 'hadir'
                                     ? Colors.green
@@ -187,7 +182,6 @@ class PresensiPage extends StatelessWidget {
         Get.offNamedUntil(AppRoutes.leave, (route) => false);
         break;
       case 2:
-        // Already on PresensiPage
         break;
     }
   }

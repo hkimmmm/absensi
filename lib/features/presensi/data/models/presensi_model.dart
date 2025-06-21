@@ -1,15 +1,12 @@
 import '../../domain/entities/presensi_entity.dart';
 import 'package:intl/intl.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
-import '../../../../services/presensi_service.dart';
 
 class PresensiModel extends Presensi {
-  final int? presensiId; // NEW: for update tracking
   static final logger = Logger();
 
   PresensiModel({
-    this.presensiId,
+    super.id,
     super.tanggal,
     super.checkinTime,
     super.checkinLat,
@@ -17,15 +14,15 @@ class PresensiModel extends Presensi {
     super.checkoutTime,
     super.checkoutLat,
     super.checkoutLng,
-    required super.status,
+    super.status,
+    super.batchId,
+    super.presensiId,
   });
 
   factory PresensiModel.fromJson(Map<String, dynamic> json) {
-    print('📥 JSON input: $json');
+    logger.d('📥 JSON input: $json');
     return PresensiModel(
-      presensiId: json['id'] is int
-          ? json['id']
-          : int.tryParse(json['id']?.toString() ?? ''),
+      id: json['id']?.toString(),
       tanggal: _parseDate(json['tanggal'], 'tanggal'),
       checkinTime: _parseDate(json['checkin_time'], 'checkin_time'),
       checkinLat: _parseDouble(json['checkin_lat'], 'checkin_lat'),
@@ -33,70 +30,65 @@ class PresensiModel extends Presensi {
       checkoutTime: _parseDate(json['checkout_time'], 'checkout_time'),
       checkoutLat: _parseDouble(json['checkout_lat'], 'checkout_lat'),
       checkoutLng: _parseDouble(json['checkout_lng'], 'checkout_lng'),
-      status: json['status']?.toString() ?? 'unknown',
+      status: json['status']?.toString(),
+      batchId: json['batchId']?.toString(),
+      presensiId: json['presensiId']?.toString(),
     );
   }
 
   static DateTime? _parseDate(dynamic value, String fieldName) {
+    if (value == null) {
+      logger.w('⚠️ $fieldName is null');
+      return null;
+    }
     try {
       return DateTime.parse(value.toString());
     } catch (e) {
-      print('⚠️ Invalid $fieldName format: $value, error: $e');
+      logger.e('⚠️ Invalid $fieldName format: $value, error: $e');
       return null;
     }
   }
 
   static double? _parseDouble(dynamic value, String fieldName) {
-    if (value == null) return null;
+    if (value == null) {
+      logger.w('⚠️ $fieldName is null');
+      return null;
+    }
     try {
       final parsed = double.tryParse(value.toString());
       if (parsed == null || parsed.isNaN || !parsed.isFinite) {
-        print('⚠️ Invalid $fieldName: $value');
+        logger.w('⚠️ Invalid $fieldName: $value');
         return null;
       }
       return parsed;
     } catch (e) {
-      print('⚠️ Error parsing $fieldName: $value, error: $e');
+      logger.e('⚠️ Error parsing $fieldName: $value, error: $e');
       return null;
     }
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson({String? type}) {
     final dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
     return {
-      if (presensiId != null) 'id': presensiId,
-      'tanggal':
-          tanggal != null ? DateFormat('yyyy-MM-dd').format(tanggal!) : null,
-      'checkin_time':
-          checkinTime != null ? dateFormat.format(checkinTime!) : null,
-      'checkin_lat': checkinLat,
-      'checkin_lng': checkinLng,
-      'checkout_time':
-          checkoutTime != null ? dateFormat.format(checkoutTime!) : null,
-      'checkout_lat': checkoutLat,
-      'checkout_lng': checkoutLng,
-      'status': status,
+      if (id != null) 'id': id,
+      if (tanggal != null) 'tanggal': tanggal!.toIso8601String().split('T')[0],
+      if (checkinTime != null)
+        'checkin_time': dateFormat.format(checkinTime!),
+      if (checkinLat != null) 'checkin_lat': checkinLat,
+      if (checkinLng != null) 'checkin_lng': checkinLng,
+      if (checkoutTime != null)
+        'checkout_time': dateFormat.format(checkoutTime!),
+      if (checkoutLat != null) 'checkout_lat': checkoutLat,
+      if (checkoutLng != null) 'checkout_lng': checkoutLng,
+      if (batchId != null) 'batchId': batchId,
+      if (presensiId != null) 'presensiId': presensiId,
+      if (type != null) 'type': type,
     };
-  }
-
-  Future<Map<String, dynamic>> toCheckoutJson() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      return {
-        'checkout_time': DateTime.now().toUtc().toIso8601String(),
-        'checkout_lat': position.latitude,
-        'checkout_lng': position.longitude,
-      };
-    } catch (e) {
-      logger.e('Geolocator error: $e');
-      throw PresensiServiceException('Gagal mendapatkan lokasi: $e');
-    }
   }
 
   Presensi toEntity() {
     return Presensi(
+      id: id,
       tanggal: tanggal,
       checkinTime: checkinTime,
       checkinLat: checkinLat,
@@ -105,12 +97,14 @@ class PresensiModel extends Presensi {
       checkoutLat: checkoutLat,
       checkoutLng: checkoutLng,
       status: status,
+      batchId: batchId,
+      presensiId: presensiId,
     );
   }
 
-  factory PresensiModel.fromEntity(Presensi entity, {int? id}) {
+  factory PresensiModel.fromEntity(Presensi entity) {
     return PresensiModel(
-      presensiId: id,
+      id: entity.id,
       tanggal: entity.tanggal,
       checkinTime: entity.checkinTime,
       checkinLat: entity.checkinLat,
@@ -119,15 +113,27 @@ class PresensiModel extends Presensi {
       checkoutLat: entity.checkoutLat,
       checkoutLng: entity.checkoutLng,
       status: entity.status,
+      batchId: entity.batchId,
+      presensiId: entity.presensiId,
     );
   }
 
   factory PresensiModel.forCheckIn({
     required String status,
+    required String batchId,
     double? checkinLat,
     double? checkinLng,
-    String? keterangan,
   }) {
+    const validStatuses = ['hadir', 'izin', 'sakit'];
+    if (!validStatuses.contains(status.toLowerCase())) {
+      logger.w(
+          '⚠️ Status tidak valid: $status. Harus salah satu dari $validStatuses');
+    }
+    if (status.toLowerCase() == 'hadir' &&
+        (checkinLat == null || checkinLng == null)) {
+      logger.w(
+          '⚠️ Lokasi (checkinLat, checkinLng) wajib diisi untuk status "hadir"');
+    }
     final wibTime = DateTime.now().toUtc().add(const Duration(hours: 7));
     return PresensiModel(
       tanggal: DateTime(wibTime.year, wibTime.month, wibTime.day),
@@ -135,21 +141,24 @@ class PresensiModel extends Presensi {
       checkinLat: checkinLat,
       checkinLng: checkinLng,
       status: status,
+      batchId: batchId,
     );
   }
 
   factory PresensiModel.forCheckOut({
-    required int presensiId,
+    required String batchId,
     double? checkoutLat,
     double? checkoutLng,
+    String? presensiId,
   }) {
     final wibTime = DateTime.now().toUtc().add(const Duration(hours: 7));
     return PresensiModel(
-      presensiId: presensiId,
+      tanggal: DateTime(wibTime.year, wibTime.month, wibTime.day),
       checkoutTime: wibTime,
       checkoutLat: checkoutLat,
       checkoutLng: checkoutLng,
-      status: 'hadir',
+      batchId: batchId,
+      presensiId: presensiId,
     );
   }
 }

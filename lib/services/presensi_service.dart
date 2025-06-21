@@ -1,4 +1,4 @@
-import 'dart:convert';
+// import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import 'package:smartelearn/core/network/api_client.dart';
@@ -25,58 +25,68 @@ class PresensiService {
 
   Future<Map<String, dynamic>> checkIn({
     required String status,
+    required String batchId,
     double? checkinLat,
     double? checkinLng,
+    String? id,
   }) async {
     try {
       final presensi = PresensiModel.forCheckIn(
         status: status,
+        batchId: batchId,
         checkinLat: checkinLat,
         checkinLng: checkinLng,
       );
-      logger.i('Presensi object toJson sebelum check-in: ${presensi.toJson()}');
-
+      logger.i('Payload check-in: ${presensi.toJson()}');
       final response =
-          await apiClient.post('/presence', data: presensi.toJson());
-      logger.i('Raw response: $response');
-
+          await apiClient.post('/checkin', data: presensi.toJson());
+      logger.i('Respons check-in: $response');
       return response;
     } on DioException catch (e) {
       _handleDioError(e);
       throw _parseError(e);
-    } catch (e) {
-      logger.e('Unexpected error during check-in: $e');
-      throw PresensiServiceException('Failed to check-in: $e');
+    } catch (e, stackTrace) {
+      logger.e('Error check-in: $e, StackTrace: $stackTrace');
+      throw PresensiServiceException('Gagal check-in: $e');
     }
   }
 
-  Future<PresensiModel> checkOut(String qrCode, PresensiModel presensi) async {
+  Future<Map<String, dynamic>> checkOut({
+    required String batchId,
+    String? presensiId,
+    double? checkoutLat,
+    double? checkoutLng,
+  }) async {
     try {
-      // Dekode Base64 QR code
-      final decodedBytes = base64Decode(qrCode);
-      final decodedJson = utf8.decode(decodedBytes);
-      final payload = jsonDecode(decodedJson);
-      final presensiId = payload['token'].toString();
-
-      // Await toCheckoutJson
-      final checkoutData = await presensi.toCheckoutJson();
-      logger.i('Presensi data untuk check-out: $checkoutData');
-
-      final response = await apiClient.patch(
-        '/presence/$presensiId',
-        data: checkoutData,
+      if (batchId.isEmpty && (presensiId == null || presensiId.isEmpty)) {
+        throw PresensiValidationException(
+            'batchId atau presensiId wajib diisi');
+      }
+      final presensi = PresensiModel.forCheckOut(
+        batchId: batchId.isEmpty ? '-' : batchId,
+        presensiId: presensiId,
+        checkoutLat: checkoutLat,
+        checkoutLng: checkoutLng,
       );
-
-      logger.i('Raw response: $response');
-
-      return PresensiModel.fromJson(response);
+      logger.i('⏏️ Sending checkout request to /checkout');
+      logger.i('Payload: ${presensi.toJson(type: 'checkout')}');
+      final response = await apiClient.post(
+        '/checkout',
+        data: presensi.toJson(type: 'checkout'),
+      );
+      logger.i('✅ Checkout response: $response');
+      if (response['message'] != 'Check-out berhasil') {
+        throw PresensiValidationException(response['message'] ??
+            'Checkout gagal dengan status tidak diketahui');
+      }
+      return response;
     } on DioException catch (e) {
-      logger.e('Dio error: ${e.response?.data}');
       _handleDioError(e);
       throw _parseError(e);
-    } catch (e) {
-      logger.e('Unexpected error during check-out: $e');
-      throw PresensiServiceException('Failed to check-out: $e');
+    } catch (e, stackTrace) {
+      logger
+          .e('Unexpected error during check-out: $e, StackTrace: $stackTrace');
+      throw PresensiServiceException('Gagal check-out: $e');
     }
   }
 
