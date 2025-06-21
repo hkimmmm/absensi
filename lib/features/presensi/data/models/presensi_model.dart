@@ -17,6 +17,7 @@ class PresensiModel extends Presensi {
     super.status,
     super.batchId,
     super.presensiId,
+    super.type,
   });
 
   factory PresensiModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +34,7 @@ class PresensiModel extends Presensi {
       status: json['status']?.toString(),
       batchId: json['batchId']?.toString(),
       presensiId: json['presensiId']?.toString(),
+      type: json['type']?.toString(),
     );
   }
 
@@ -72,8 +74,7 @@ class PresensiModel extends Presensi {
     return {
       if (id != null) 'id': id,
       if (tanggal != null) 'tanggal': tanggal!.toIso8601String().split('T')[0],
-      if (checkinTime != null)
-        'checkin_time': dateFormat.format(checkinTime!),
+      if (checkinTime != null) 'checkin_time': dateFormat.format(checkinTime!),
       if (checkinLat != null) 'checkin_lat': checkinLat,
       if (checkinLng != null) 'checkin_lng': checkinLng,
       if (checkoutTime != null)
@@ -82,7 +83,7 @@ class PresensiModel extends Presensi {
       if (checkoutLng != null) 'checkout_lng': checkoutLng,
       if (batchId != null) 'batchId': batchId,
       if (presensiId != null) 'presensiId': presensiId,
-      if (type != null) 'type': type,
+      'type': type ?? this.type ?? 'checkin',
     };
   }
 
@@ -99,6 +100,7 @@ class PresensiModel extends Presensi {
       status: status,
       batchId: batchId,
       presensiId: presensiId,
+      type: type,
     );
   }
 
@@ -115,6 +117,7 @@ class PresensiModel extends Presensi {
       status: entity.status,
       batchId: entity.batchId,
       presensiId: entity.presensiId,
+      type: entity.type,
     );
   }
 
@@ -142,6 +145,7 @@ class PresensiModel extends Presensi {
       checkinLng: checkinLng,
       status: status,
       batchId: batchId,
+      type: 'checkin', // Tambahkan field type di PresensiModel
     );
   }
 

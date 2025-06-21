@@ -10,6 +10,7 @@ class Presensi {
   final String? status; // Ubah menjadi opsional
   final String? batchId;
   final String? presensiId; // Tambahkan untuk QR perorangan
+  final String? type;
 
   Presensi({
     this.id,
@@ -23,6 +24,7 @@ class Presensi {
     this.status,
     this.batchId,
     this.presensiId,
+    this.type,
   });
 
   factory Presensi.forCheckIn({

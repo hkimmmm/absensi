@@ -28,12 +28,11 @@ class PresensiRemoteDatasourceImpl implements PresensiRemoteDatasource {
     try {
       final response = await service.checkIn(
         id: data.id,
-        status: data.status ?? '',
-        batchId: data.batchId!,
+        status: data.status ?? 'hadir', // Default ke 'hadir' jika null
+        batchId: data.batchId ?? '', // Pastikan batchId tidak null
         checkinLat: data.checkinLat,
         checkinLng: data.checkinLng,
       );
-      print('📥 RemoteDatasource: Response check-in: $response');
       if (response['message'] == 'Check-in berhasil') {
         return PresensiModel(
           id: response['presensiId']?.toString(),
@@ -41,8 +40,9 @@ class PresensiRemoteDatasourceImpl implements PresensiRemoteDatasource {
           checkinTime: data.checkinTime ?? DateTime.now(),
           checkinLat: data.checkinLat,
           checkinLng: data.checkinLng,
-          status: data.status,
+          status: data.status ?? 'hadir',
           batchId: data.batchId,
+          type: 'checkin', // Tambahkan type
         );
       } else {
         throw PresensiServiceException(response['message'] ?? 'Check-in gagal');
