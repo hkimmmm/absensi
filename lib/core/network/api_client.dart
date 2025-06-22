@@ -202,4 +202,35 @@ class ApiClient {
       throw Exception('An unexpected error occurred');
     }
   }
+
+  Future<Map<String, dynamic>> put(String path, {dynamic data}) async {
+    try {
+      final response = await dio.put(
+        path,
+        data: data,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ),
+      );
+
+      if (response.data == null) {
+        throw Exception('Empty response from server');
+      }
+
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Invalid response format: expected Map');
+      }
+
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      logger.e('DioError: ${e.message}', error: e);
+      if (e.response != null) {
+        throw Exception(e.response?.data['message'] ?? 'Request failed');
+      }
+      throw Exception('Network error occurred');
+    } catch (e) {
+      logger.e('Unexpected error: $e', error: e);
+      throw Exception('An unexpected error occurred');
+    }
+  }
 }

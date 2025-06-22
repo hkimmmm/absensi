@@ -67,140 +67,142 @@ class DashboardPage extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: Colors.white,
-          body: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Obx(() {
-                  final controller = Get.find<DashboardController>();
-                  final user = controller.userInfoFromRepo.value;
+          body: SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Obx(() {
+                    final controller = Get.find<DashboardController>();
+                    final user = controller.userInfoFromRepo.value;
 
-                  final nama = user?.nama ?? 'Guest';
-                  final position = user?.role ?? 'Karyawan';
-                  final fotoProfile = user?.fotoProfile;
+                    final nama = user?.nama ?? 'Guest';
+                    final position = user?.role ?? 'Karyawan';
+                    final fotoProfile = user?.fotoProfile;
 
-                  return HeaderProfile(
-                    nama: nama,
-                    position: position,
-                    fotoProfile: fotoProfile,
-                    onNotificationPressed: () {
-                      debugPrint('Notification button pressed');
-                    },
-                  );
-                }),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: DayChips(
-                    dates: dates,
-                    currentDate: now,
-                  ),
+                    return HeaderProfile(
+                      nama: nama,
+                      position: position,
+                      fotoProfile: fotoProfile,
+                      onNotificationPressed: () {
+                        debugPrint('Notification button pressed');
+                      },
+                    );
+                  }),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(30),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: DayChips(
+                      dates: dates,
+                      currentDate: now,
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(24, 16, 24, 16),
-                        child: Text(
-                          'Today Attendance',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                ),
+                SliverToBoxAdapter(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(30),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(24, 16, 24, 16),
+                          child: Text(
+                            'Today Attendance',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      Obx(() {
-                        final list = presensiController.presensiList;
-                        final today = DateTime.now();
-                        final todayPresensi = list.firstWhereOrNull(
-                          (item) =>
-                              item.checkinTime != null &&
-                              isSameDay(item.checkinTime!, today),
-                        );
+                        Obx(() {
+                          final list = presensiController.presensiList;
+                          final today = DateTime.now();
+                          final todayPresensi = list.firstWhereOrNull(
+                            (item) =>
+                                item.checkinTime != null &&
+                                isSameDay(item.checkinTime!, today),
+                          );
 
-                        return AttendanceSection(
-                          checkInTime: todayPresensi != null
-                              ? formatTimeOnly(todayPresensi.checkinTime)
-                              : null,
-                          checkInStatus: todayPresensi?.status ?? 'Pending',
-                          checkOutTime: todayPresensi?.checkoutTime != null
-                              ? formatTimeOnly(todayPresensi?.checkoutTime)
-                              : null,
-                          checkOutStatus: todayPresensi?.checkoutTime != null
-                              ? 'Go Home'
-                              : null,
-                        );
-                      }),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: InfoCard(
-                                title: 'Break Time',
-                                value: '00:30 min',
-                                status: 'Avg Time 30 min',
-                                icon: Icons.access_time,
+                          return AttendanceSection(
+                            checkInTime: todayPresensi != null
+                                ? formatTimeOnly(todayPresensi.checkinTime)
+                                : null,
+                            checkInStatus: todayPresensi?.status ?? 'Pending',
+                            checkOutTime: todayPresensi?.checkoutTime != null
+                                ? formatTimeOnly(todayPresensi?.checkoutTime)
+                                : null,
+                            checkOutStatus: todayPresensi?.checkoutTime != null
+                                ? 'Go Home'
+                                : null,
+                          );
+                        }),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: InfoCard(
+                                  title: 'Break Time',
+                                  value: '00:30 min',
+                                  status: 'Avg Time 30 min',
+                                  icon: Icons.access_time,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: InfoCard(
-                                title: 'Total Days',
-                                value: '28',
-                                status: 'Working Days',
-                                icon: Icons.calendar_today,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: InfoCard(
+                                  title: 'Total Days',
+                                  value: '28',
+                                  status: 'Working Days',
+                                  icon: Icons.calendar_today,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Obx(() {
-                  final list = presensiController.presensiList;
-                  if (list.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text("Belum ada data presensi."),
+                SliverToBoxAdapter(
+                  child: Obx(() {
+                    final list = presensiController.presensiList;
+                    if (list.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text("Belum ada data presensi."),
+                      );
+                    }
+
+                    final item = list.first;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: ActivitySection(
+                        checkInDate: formatDateTime(item.checkinTime),
+                        checkInTime: formatDateTime(item.checkinTime),
+                        checkInStatus: item.status ?? 'Pending',
+                        checkOutDate: item.checkoutTime != null
+                            ? formatDateTime(item.checkoutTime)
+                            : null,
+                        checkOutTime: item.checkoutTime != null
+                            ? formatDateTime(item.checkoutTime)
+                            : null,
+                        breakInDate: null,
+                        breakInTime: null,
+                        breakOutDate: null,
+                        breakOutTime: null,
+                      ),
                     );
-                  }
-
-                  final item = list.first;
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: ActivitySection(
-                      checkInDate: formatDateTime(item.checkinTime),
-                      checkInTime: formatDateTime(item.checkinTime),
-                      checkInStatus: item.status ?? 'Pending',
-                      checkOutDate: item.checkoutTime != null
-                          ? formatDateTime(item.checkoutTime)
-                          : null,
-                      checkOutTime: item.checkoutTime != null
-                          ? formatDateTime(item.checkoutTime)
-                          : null,
-                      breakInDate: null,
-                      breakInTime: null,
-                      breakOutDate: null,
-                      breakOutTime: null,
-                    ),
-                  );
-                }),
-              ),
-            ],
+                  }),
+                ),
+              ],
+            ),
           ),
           bottomNavigationBar: const CustomBottomNavigationBar(),
         );

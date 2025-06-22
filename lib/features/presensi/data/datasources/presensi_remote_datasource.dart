@@ -28,8 +28,8 @@ class PresensiRemoteDatasourceImpl implements PresensiRemoteDatasource {
     try {
       final response = await service.checkIn(
         id: data.id,
-        status: data.status ?? 'hadir', // Default ke 'hadir' jika null
-        batchId: data.batchId ?? '', // Pastikan batchId tidak null
+        status: data.status ?? 'hadir',
+        batchId: data.batchId ?? '',
         checkinLat: data.checkinLat,
         checkinLng: data.checkinLng,
       );

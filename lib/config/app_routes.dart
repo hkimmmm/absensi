@@ -6,7 +6,8 @@ import 'package:smartelearn/features/leaves/presentation/page/apply_leave_page.d
 import 'package:smartelearn/features/presensi/presentation/pages/checkin.dart';
 import 'package:smartelearn/features/presensi/presentation/pages/checkout.dart';
 import 'package:smartelearn/features/presensi/presentation/pages/presensi_page.dart';
-import 'package:smartelearn/features/profiles/presentation/pages/profile.dart';
+import 'package:smartelearn/features/profile/presentation/pages/profile.dart';
+import 'package:smartelearn/features/profile/presentation/pages/profile_detail_page.dart';
 // import 'package:smartelearn/features/presensi/presentation/pages/qr_code_screen.dart';
 import 'package:smartelearn/features/splash/presentation/screens/splash_screen.dart';
 
@@ -15,6 +16,7 @@ import 'package:smartelearn/core/bindings/auth_binding.dart';
 import 'package:smartelearn/core/bindings/dashboard_binding.dart';
 import 'package:smartelearn/core/bindings/leave_binding.dart';
 import 'package:smartelearn/core/bindings/presensi_binding.dart';
+import 'package:smartelearn/core/bindings/profile_binding.dart';
 import 'package:smartelearn/core/bindings/navigation_binding.dart';
 
 class AppRoutes {
@@ -28,6 +30,7 @@ class AppRoutes {
   static const checkout = '/checkout';
   static const presensi = '/presensi';
   static const profile = '/profile';
+  static const profiledetail = '/profiledetail';
 
   static final pages = [
     GetPage(name: splash, page: () => SplashScreen(), binding: CoreBinding()),
@@ -104,7 +107,16 @@ class AppRoutes {
         CoreBinding(),
         AuthBinding(),
         NavigationBinding(),
-        DashboardBinding(),
+        ProfileBinding(),
+      ],
+    ),
+    GetPage(
+      name: profiledetail,
+      page: () => ProfileDetailPage(),
+      bindings: [
+        CoreBinding(),
+        AuthBinding(),
+        ProfileBinding(),
       ],
     ),
   ];

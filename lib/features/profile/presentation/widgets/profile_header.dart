@@ -1,12 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:smartelearn/core/network/api_client.dart';
 
 class ProfileHeader extends StatelessWidget {
   final String nama;
   final String email;
   final String? fotoProfile;
-  final String baseUrl = "http://192.168.18.9:3000";
+  final logger = Logger();
 
-  const ProfileHeader({
+  ProfileHeader({
     super.key,
     required this.nama,
     required this.email,
@@ -65,8 +69,7 @@ class ProfileHeader extends StatelessWidget {
 
   Widget _buildProfileAvatar() {
     if (fotoProfile == null || fotoProfile!.isEmpty) {
-      // ignore: avoid_print
-      print("DEBUG: fotoProfile kosong atau null, tampilkan icon default");
+      logger.d("fotoProfile kosong atau null, tampilkan icon default");
       return CircleAvatar(
         radius: 50,
         backgroundColor: Colors.blue[100],
@@ -74,32 +77,25 @@ class ProfileHeader extends StatelessWidget {
       );
     }
 
-    // Pastikan baseUrl dan fotoProfile terhubung dengan benar
-    final String fullImageUrl = fotoProfile!.startsWith('/')
-        ? "$baseUrl$fotoProfile"
-        : "$baseUrl/$fotoProfile";
-
-    // ignore: avoid_print
-    print("DEBUG: fullImageUrl = $fullImageUrl");
+    // Ambil baseUrl dari ApiClient
+    final String baseUrl = Get.find<ApiClient>().dio.options.baseUrl;
+    final String fullImageUrl =
+        Uri.parse(baseUrl).resolve(fotoProfile!).toString();
+    logger.d("fullImageUrl = $fullImageUrl");
 
     return CircleAvatar(
       radius: 50,
       backgroundColor: Colors.blue[100],
       child: ClipOval(
-        child: Image.network(
-          fullImageUrl,
+        child: CachedNetworkImage(
+          imageUrl: fullImageUrl,
           width: 100,
           height: 100,
           fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            // ignore: avoid_print
-            print("DEBUG: Gagal load gambar profile: $error");
+          placeholder: (context, url) =>
+              const Center(child: CircularProgressIndicator()),
+          errorWidget: (context, url, error) {
+            logger.e("Gagal load gambar profile: $error");
             return Container(
               color: Colors.blue[100],
               alignment: Alignment.center,

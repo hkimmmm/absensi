@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:smartelearn/features/dashboard/presentation/controllers/dashboard_controller.dart';
+import 'package:smartelearn/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:smartelearn/features/navigation/bottom_nav_bar/custom_bottom_navigation_bar.dart';
-import './profile_detail_page.dart';
+import 'profile_detail_page.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_menu.dart';
 
@@ -14,8 +14,8 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ambil DashboardController
-    final DashboardController controller = Get.find<DashboardController>();
+    // Ambil ProfileController
+    final ProfileController controller = Get.find<ProfileController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -35,12 +35,8 @@ class ProfilePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileDetailPage(),
-                ),
-              );
+              // Gunakan GetX untuk navigasi
+              Get.to(() => const ProfileDetailPage());
             },
           ),
         ],
@@ -62,7 +58,7 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: controller.fetchUserInfo,
+                  onPressed: controller.fetchProfile,
                   child: const Text('Coba Lagi'),
                 ),
               ],
@@ -70,8 +66,8 @@ class ProfilePage extends StatelessWidget {
           );
         }
 
-        // Ambil data user dari userInfoFromRepo
-        final user = controller.userInfoFromRepo.value;
+        // Ambil data user dari profile
+        final user = controller.profile.value;
         final nama = user?.nama ?? 'Guest';
         final email = user?.email ?? 'email@contoh.com';
         final fotoProfile = user?.fotoProfile;
@@ -87,7 +83,7 @@ class ProfilePage extends StatelessWidget {
                 fotoProfile: fotoProfile,
               ),
               const SizedBox(height: 20),
-              // Profile Menu Items
+              // Profile Menu Items untuk karyawan
               const ProfileMenu(),
             ],
           ),

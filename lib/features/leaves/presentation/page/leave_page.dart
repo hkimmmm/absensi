@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:smartelearn/config/app_routes.dart';
 import '../controllers/leave_controller.dart';
 import '../widgets/leaves_header.dart';
 import '../widgets/leaves_summary.dart';
 import '../widgets/leaves_tabs.dart';
-import 'package:smartelearn/features/navigation/bottom_nav_bar/bottom_nav_bar.dart';
-import 'package:smartelearn/features/navigation/controller/bottom_nav_controller.dart';
+import 'package:smartelearn/features/navigation/bottom_nav_bar/custom_bottom_navigation_bar.dart';
 
 class LeavePage extends StatelessWidget {
   const LeavePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final navController = Get.find<BottomNavController>();
     final leaveController = Get.find<LeaveController>();
 
     // Tambahkan inisialisasi data saat pertama kali dibuka
@@ -96,26 +93,8 @@ class LeavePage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: Obx(() => CustomBottomNavigationBar(
-            currentIndex: navController.currentIndex.value,
-            onTap: (index) => _handleNavigation(index, navController),
-          )),
+      bottomNavigationBar: const CustomBottomNavigationBar(),
     );
-  }
-
-  void _handleNavigation(int index, BottomNavController navController) {
-    navController.changeIndex(index);
-    switch (index) {
-      case 0:
-        Get.offNamedUntil(AppRoutes.dashboard, (route) => false);
-        break;
-      case 1:
-        // Tetap di halaman leaves
-        break;
-      case 2:
-        Get.offNamedUntil(AppRoutes.presensi, (route) => false);
-        break;
-    }
   }
 
   void _showFilterDialog(BuildContext context, LeaveController controller) {
