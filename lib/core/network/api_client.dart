@@ -10,8 +10,8 @@ class ApiClient {
   ApiClient()
       : dio = Dio(
           BaseOptions(
-            //192.168.230.198
-            //'http://10.137.251.61:3000/api'
+            //'http://192.168.1.11:3000/api', milik citra buana
+            //'http://192.168.18.9:3000/api', milik citra rumah
             baseUrl: 'http://192.168.18.9:3000/api',
             connectTimeout: const Duration(seconds: 10),
             receiveTimeout: const Duration(seconds: 10),

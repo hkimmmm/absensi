@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:smartelearn/config/app_routes.dart';
-import 'package:smartelearn/features/navigation/bottom_nav_bar/bottom_nav_bar.dart';
-import 'package:smartelearn/features/navigation/controller/bottom_nav_controller.dart';
+import 'package:smartelearn/features/navigation/bottom_nav_bar/custom_bottom_navigation_bar.dart';
 import '../controllers/presensi_controller.dart';
 import './checkin.dart';
 import './checkout.dart';
@@ -25,8 +23,6 @@ class PresensiPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PresensiController>();
-    final navController = Get.find<BottomNavController>();
-
     return FutureBuilder(
       future: initLocale(),
       builder: (context, snapshot) {
@@ -161,28 +157,9 @@ class PresensiPage extends StatelessWidget {
               ],
             ),
           ),
-          bottomNavigationBar: Obx(
-            () => CustomBottomNavigationBar(
-              currentIndex: navController.currentIndex.value,
-              onTap: (index) => _handleNavigation(index, navController),
-            ),
-          ),
+          bottomNavigationBar: const CustomBottomNavigationBar(),
         );
       },
     );
-  }
-
-  void _handleNavigation(int index, BottomNavController navController) {
-    navController.changeIndex(index);
-    switch (index) {
-      case 0:
-        Get.offNamedUntil(AppRoutes.dashboard, (route) => false);
-        break;
-      case 1:
-        Get.offNamedUntil(AppRoutes.leave, (route) => false);
-        break;
-      case 2:
-        break;
-    }
   }
 }

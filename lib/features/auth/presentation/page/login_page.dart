@@ -168,7 +168,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  void _submitForm() {
+  void _submitForm() { 
     if (_formKey.currentState!.validate()) {
       authController
           .login(

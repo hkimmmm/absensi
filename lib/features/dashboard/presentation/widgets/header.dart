@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:smartelearn/core/network/api_client.dart';
 
 class HeaderProfile extends StatelessWidget {
   final String nama;
   final String position;
   final String? fotoProfile;
   final VoidCallback? onNotificationPressed;
-  final String baseUrl = "http://192.168.18.9:3000";
+  final Logger logger = Logger();
 
-  const HeaderProfile({
+  HeaderProfile({
     super.key,
     required this.nama,
     required this.position,
@@ -61,8 +64,7 @@ class HeaderProfile extends StatelessWidget {
 
   Widget _buildProfileAvatar() {
     if (fotoProfile == null || fotoProfile!.isEmpty) {
-      // ignore: avoid_print
-      print("DEBUG: fotoProfile kosong atau null, tampilkan icon default");
+      logger.d("fotoProfile kosong atau null, tampilkan icon default");
       return CircleAvatar(
         radius: 30,
         backgroundColor: Colors.blue[100],
@@ -70,13 +72,11 @@ class HeaderProfile extends StatelessWidget {
       );
     }
 
-    // Pastikan baseUrl dan fotoProfile terhubung dengan benar
-    final String fullImageUrl = fotoProfile!.startsWith('/')
-        ? "$baseUrl$fotoProfile"
-        : "$baseUrl/$fotoProfile";
-
-    // ignore: avoid_print
-    print("DEBUG: fullImageUrl = $fullImageUrl");
+    // Ambil baseUrl dari ApiClient
+    final String baseUrl = Get.find<ApiClient>().dio.options.baseUrl;
+    final String fullImageUrl =
+        Uri.parse(baseUrl).resolve(fotoProfile!).toString();
+    logger.d("fullImageUrl = $fullImageUrl");
 
     return CircleAvatar(
       radius: 30,
@@ -94,8 +94,7 @@ class HeaderProfile extends StatelessWidget {
             );
           },
           errorBuilder: (context, error, stackTrace) {
-            // ignore: avoid_print
-            print("DEBUG: Gagal load gambar profile: $error");
+            logger.e("Gagal load gambar profile: $error");
             return Container(
               color: Colors.blue[100],
               alignment: Alignment.center,

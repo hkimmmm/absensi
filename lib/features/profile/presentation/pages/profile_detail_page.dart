@@ -86,27 +86,29 @@ class ProfileDetailPage extends StatelessWidget {
                   children: [
                     _buildDetailItem(
                       icon: Icons.person,
-                      label: 'Full Name',
+                      label: 'Nama',
                       initialValue: nama,
                       onChanged: (value) => controller.nama.value = value,
-                      validator: (value) => value!.isEmpty ? 'Nama wajib diisi' : null,
+                      validator: (value) =>
+                          value!.isEmpty ? 'Nama wajib diisi' : null,
                     ),
                     _buildDetailItem(
                       icon: Icons.email,
                       label: 'Email',
                       initialValue: email,
                       onChanged: (value) => controller.email.value = value,
-                      validator: (value) => value!.isEmpty ? 'Email wajib diisi' : null,
+                      validator: (value) =>
+                          value!.isEmpty ? 'Email wajib diisi' : null,
                     ),
                     _buildDetailItem(
                       icon: Icons.phone,
-                      label: 'Phone',
+                      label: 'Nomor Telepon',
                       initialValue: noTelp,
                       onChanged: (value) => controller.noTelp.value = value,
                     ),
                     _buildDetailItem(
                       icon: Icons.location_on,
-                      label: 'Address',
+                      label: 'Alamat',
                       initialValue: alamat,
                       onChanged: (value) => controller.alamat.value = value,
                     ),
@@ -137,7 +139,8 @@ class ProfileDetailPage extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4285F4),
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -170,7 +173,8 @@ class ProfileDetailPage extends StatelessWidget {
     }
 
     final String baseUrl = Get.find<ApiClient>().dio.options.baseUrl;
-    final String fullImageUrl = Uri.parse(baseUrl).resolve(fotoProfile).toString();
+    final String fullImageUrl =
+        Uri.parse(baseUrl).resolve(fotoProfile).toString();
 
     return CircleAvatar(
       radius: 60,
@@ -181,7 +185,8 @@ class ProfileDetailPage extends StatelessWidget {
           width: 120,
           height: 120,
           fit: BoxFit.cover,
-          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+          placeholder: (context, url) =>
+              const Center(child: CircularProgressIndicator()),
           errorWidget: (context, url, error) => Container(
             color: Colors.blue[100],
             alignment: Alignment.center,
@@ -192,7 +197,8 @@ class ProfileDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailCard({required String title, required List<Widget> children}) {
+  Widget _buildDetailCard(
+      {required String title, required List<Widget> children}) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -249,7 +255,8 @@ class ProfileDetailPage extends StatelessWidget {
                   initialValue: initialValue,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                   style: const TextStyle(
                     fontSize: 16,

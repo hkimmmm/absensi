@@ -148,8 +148,8 @@ class DashboardPage extends StatelessWidget {
                               Expanded(
                                 child: InfoCard(
                                   title: 'Break Time',
-                                  value: '00:30 min',
-                                  status: 'Avg Time 30 min',
+                                  value: '60:00 min',
+                                  status: 'Avg Time 1 hours',
                                   icon: Icons.access_time,
                                 ),
                               ),

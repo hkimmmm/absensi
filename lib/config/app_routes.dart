@@ -38,7 +38,8 @@ class AppRoutes {
       name: login,
       page: () => LoginPage(),
       bindings: [
-        CoreBinding(), // Tambahkan
+        CoreBinding(),
+        AuthBinding() // Tambahkan vb697gy8
       ],
     ),
     GetPage(
