@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import '../pages/profile_detail_page.dart';
+import 'package:get/get.dart';
+import 'package:smartelearn/config/app_routes.dart';
+import 'package:smartelearn/features/auth/presentation/controller/auth_controller.dart';
 
 class ProfileMenu extends StatelessWidget {
   const ProfileMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.find<AuthController>();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -17,12 +21,8 @@ class ProfileMenu extends StatelessWidget {
             title: 'Profile Details',
             subtitle: 'View and edit your profile information',
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileDetailPage(),
-                ),
-              );
+              Get.toNamed(
+                  AppRoutes.profiledetail); // Gunakan GetX untuk navigasi
             },
           ),
           _buildModernMenuCard(
@@ -71,7 +71,7 @@ class ProfileMenu extends StatelessWidget {
                 elevation: 0,
               ),
               onPressed: () {
-                _showLogoutDialog(context);
+                _showLogoutDialog(context, authController);
               },
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -155,7 +155,7 @@ class ProfileMenu extends StatelessWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, AuthController authController) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -209,17 +209,16 @@ class ProfileMenu extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('You have been logged out'),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                              ),
-                            ),
+                        onPressed: () async {
+                          Navigator.pop(context); // Tutup dialog
+                          await authController
+                              .logout(); // Panggil fungsi logout
+                          Get.snackbar(
+                            'Logout',
+                            'You have been logged out',
+                            snackPosition: SnackPosition.BOTTOM,
+                            margin: const EdgeInsets.all(10),
+                            borderRadius: 10,
                           );
                         },
                         child: const Text('Log Out'),
@@ -249,7 +248,7 @@ class ProfileMenu extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Image.asset(
-                  'assets/logo.png', // Replace with your app logo
+                  'assets/icons/icon.png',
                   height: 80,
                 ),
                 const SizedBox(height: 16),

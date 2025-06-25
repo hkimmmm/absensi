@@ -8,7 +8,6 @@ import 'package:smartelearn/features/presensi/presentation/pages/checkout.dart';
 import 'package:smartelearn/features/presensi/presentation/pages/presensi_page.dart';
 import 'package:smartelearn/features/profile/presentation/pages/profile.dart';
 import 'package:smartelearn/features/profile/presentation/pages/profile_detail_page.dart';
-// import 'package:smartelearn/features/presensi/presentation/pages/qr_code_screen.dart';
 import 'package:smartelearn/features/splash/presentation/screens/splash_screen.dart';
 
 import 'package:smartelearn/core/bindings/core_binding.dart';
@@ -39,7 +38,7 @@ class AppRoutes {
       page: () => LoginPage(),
       bindings: [
         CoreBinding(),
-        AuthBinding() // Tambahkan vb697gy8
+        AuthBinding()
       ],
     ),
     GetPage(

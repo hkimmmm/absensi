@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../config/app_routes.dart';
+import 'package:smartelearn/features/auth/presentation/controller/auth_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  SplashScreenState createState() => SplashScreenState();
+  // ignore: library_private_types_in_public_api
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -27,9 +29,17 @@ class SplashScreenState extends State<SplashScreen>
     // Start animation
     _controller.forward();
 
-    // Navigate to login after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.offNamed(AppRoutes.login);
+    // Check login status and navigate after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () async {
+      final AuthController authController = Get.find<AuthController>();
+      bool isLoggedIn = await authController.isLoggedIn();
+      if (isLoggedIn) {
+        // Opsional: Validasi token jika diperlukan
+        // Misalnya, panggil API untuk memverifikasi token
+        Get.offNamed(AppRoutes.dashboard); // Ke dashboard jika sudah login
+      } else {
+        Get.offNamed(AppRoutes.login); // Ke login jika belum login
+      }
     });
   }
 

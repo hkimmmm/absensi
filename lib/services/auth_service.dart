@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import 'package:smartelearn/core/network/api_client.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final ApiClient apiClient = ApiClient();
@@ -35,5 +36,12 @@ class AuthService {
         throw Exception(e.message);
       }
     }
+  }
+
+  Future<void> clearAuthData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('user_id');
+    await apiClient.clearToken(); // Pastikan ApiClient memiliki fungsi ini
   }
 }

@@ -44,10 +44,22 @@ class PresensiModel extends Presensi {
       return null;
     }
     try {
-      return DateTime.parse(value.toString());
+      // Parse tanggal dan kembalikan hanya tanggal untuk field 'tanggal'
+      final date = DateTime.parse(value.toString());
+      if (fieldName == 'tanggal') {
+        return DateTime(date.year, date.month, date.day);
+      }
+      return date;
     } catch (e) {
-      logger.e('⚠️ Invalid $fieldName format: $value, error: $e');
-      return null;
+      // Coba format 'yyyy-MM-dd'
+      try {
+        final formatter = DateFormat('yyyy-MM-dd');
+        final date = formatter.parse(value.toString());
+        return DateTime(date.year, date.month, date.day);
+      } catch (e2) {
+        logger.e('⚠️ Invalid $fieldName format: $value, error: $e2');
+        return null;
+      }
     }
   }
 

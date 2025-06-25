@@ -1,3 +1,4 @@
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+  const DashboardPage({super.key}); // Menggunakan super parameter
 
   Future<void> initLocale() async {
     await initializeDateFormatting('id_ID', null);
@@ -39,11 +40,14 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<PresensiController>();
+    final presensiController = Get.find<PresensiController>();
 
+    // Panggil loadPresensi saat halaman dimuat
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.loadPresensi();
+      presensiController.loadPresensi();
     });
+
+    // Atur tampilan status bar
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -54,7 +58,6 @@ class DashboardPage extends StatelessWidget {
 
     final now = DateTime.now();
     final dates = List.generate(4, (index) => now.add(Duration(days: index)));
-    final presensiController = Get.find<PresensiController>();
 
     return FutureBuilder(
       future: initLocale(),
@@ -67,7 +70,10 @@ class DashboardPage extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: Colors.white,
-          body: SafeArea(
+          body: RefreshIndicator(
+            onRefresh: () async {
+              await presensiController.loadPresensi();
+            },
             child: CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
@@ -75,7 +81,7 @@ class DashboardPage extends StatelessWidget {
                     final controller = Get.find<DashboardController>();
                     final user = controller.userInfoFromRepo.value;
 
-                    final nama = user?.nama ?? 'Guest';
+                    final nama = user?.nama ?? 'Tamu';
                     final position = user?.role ?? 'Karyawan';
                     final fotoProfile = user?.fotoProfile;
 
@@ -84,7 +90,7 @@ class DashboardPage extends StatelessWidget {
                       position: position,
                       fotoProfile: fotoProfile,
                       onNotificationPressed: () {
-                        debugPrint('Notification button pressed');
+                        debugPrint('Tombol notifikasi ditekan');
                       },
                     );
                   }),
@@ -112,7 +118,7 @@ class DashboardPage extends StatelessWidget {
                         const Padding(
                           padding: EdgeInsets.fromLTRB(24, 16, 24, 16),
                           child: Text(
-                            'Today Attendance',
+                            'Kehadiran Hari Ini',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -132,12 +138,12 @@ class DashboardPage extends StatelessWidget {
                             checkInTime: todayPresensi != null
                                 ? formatTimeOnly(todayPresensi.checkinTime)
                                 : null,
-                            checkInStatus: todayPresensi?.status ?? 'Pending',
+                            checkInStatus: todayPresensi?.status ?? 'Menunggu',
                             checkOutTime: todayPresensi?.checkoutTime != null
                                 ? formatTimeOnly(todayPresensi?.checkoutTime)
                                 : null,
                             checkOutStatus: todayPresensi?.checkoutTime != null
-                                ? 'Go Home'
+                                ? 'Pulang'
                                 : null,
                           );
                         }),
@@ -147,18 +153,18 @@ class DashboardPage extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: InfoCard(
-                                  title: 'Break Time',
-                                  value: '60:00 min',
-                                  status: 'Avg Time 1 hours',
+                                  title: 'Waktu Istirahat',
+                                  value: '60:00 menit',
+                                  status: 'Rata-rata 1 jam',
                                   icon: Icons.access_time,
                                 ),
                               ),
                               const SizedBox(width: 16),
                               Expanded(
                                 child: InfoCard(
-                                  title: 'Total Days',
+                                  title: 'Total Hari',
                                   value: '28',
-                                  status: 'Working Days',
+                                  status: 'Hari Kerja',
                                   icon: Icons.calendar_today,
                                 ),
                               ),
@@ -179,14 +185,27 @@ class DashboardPage extends StatelessWidget {
                       );
                     }
 
-                    final item = list.first;
+                    // Filter dan urutkan list untuk menghindari null
+                    final sortedList = list
+                        .where((item) => item.checkinTime != null)
+                        .toList()
+                      ..sort((a, b) => b.checkinTime!.compareTo(a.checkinTime!));
+
+                    if (sortedList.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text("Belum ada data presensi dengan check-in."),
+                      );
+                    }
+
+                    final item = sortedList.first;
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: ActivitySection(
                         checkInDate: formatDateTime(item.checkinTime),
                         checkInTime: formatDateTime(item.checkinTime),
-                        checkInStatus: item.status ?? 'Pending',
+                        checkInStatus: item.status ?? 'Menunggu',
                         checkOutDate: item.checkoutTime != null
                             ? formatDateTime(item.checkoutTime)
                             : null,

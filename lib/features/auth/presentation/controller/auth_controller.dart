@@ -1,14 +1,17 @@
 import 'dart:convert';
 
+import 'package:smartelearn/config/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartelearn/features/auth/domain/usecases/login_usecase.dart';
 import 'package:smartelearn/features/auth/domain/entities/user_entity.dart';
 import 'package:smartelearn/features/auth/data/models/user_model.dart';
+import 'package:smartelearn/services/auth_service.dart';
 // import 'package:smartelearn/features/leaves/data/models/leave_model.dart';
 
 class AuthController extends GetxController {
   final LoginUsecase loginUseCase;
+  final AuthService authService = Get.find<AuthService>();
 
   AuthController({required this.loginUseCase});
 
@@ -30,8 +33,7 @@ class AuthController extends GetxController {
         final userModel = UserModel.fromJson(json.decode(userJsonString));
         user.value = userModel.toEntity();
       } catch (e) {
-        await prefs.remove('user_data');
-        user.value = null;
+        await logout();
       }
     }
   }
@@ -80,5 +82,14 @@ class AuthController extends GetxController {
     user.value = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('user_data');
+    await authService.clearAuthData(); // Hapus token dan user_id
+    Get.offAllNamed(AppRoutes.login); // Arahkan ke login
+  }
+
+  // Fungsi untuk memeriksa status login
+  Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_data') != null &&
+        prefs.getString('auth_token') != null;
   }
 }
