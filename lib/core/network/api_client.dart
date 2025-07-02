@@ -12,6 +12,7 @@ class ApiClient {
           BaseOptions(
             //'http://192.168.1.11:3000/api', milik citra buana
             //'http://192.168.18.9:3000/api', milik citra rumah
+            // 192.168.133.198 hp saya
             baseUrl: 'http://192.168.18.9:3000/api',
             connectTimeout: const Duration(seconds: 10),
             receiveTimeout: const Duration(seconds: 10),

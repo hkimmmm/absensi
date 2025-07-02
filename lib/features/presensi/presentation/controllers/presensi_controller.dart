@@ -73,12 +73,8 @@ class PresensiController extends GetxController {
       await refreshData();
       return result;
     } catch (e, stackTrace) {
-      error.value =
-          e is PresensiValidationException || e is PresensiServiceException
-              ? e.toString()
-              : 'Gagal check-in: ${e.toString()}';
+      error.value = e.toString(); // Gunakan e.toString() untuk semua error
       print('❌ Controller: checkIn failed: $e, StackTrace: $stackTrace');
-      Get.snackbar('Error', error.value!, duration: Duration(seconds: 5));
       return null;
     }
   }

@@ -47,7 +47,8 @@ class PresensiService {
       throw _parseError(e);
     } catch (e, stackTrace) {
       logger.e('Error check-in: $e, StackTrace: $stackTrace');
-      throw PresensiServiceException('Gagal check-in: $e');
+      throw PresensiServiceException(
+          'Gagal check-in: Terjadi kesalahan tidak terduga');
     }
   }
 
@@ -118,6 +119,9 @@ class PresensiService {
 class PresensiServiceException implements Exception {
   final String message;
   PresensiServiceException(this.message);
+
+  @override
+  String toString() => message;
 }
 
 class PresensiValidationException extends PresensiServiceException {

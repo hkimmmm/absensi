@@ -19,45 +19,43 @@ class HeaderProfile extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Foto Profil
-          _buildProfileAvatar(),
-
-          const SizedBox(width: 16),
-
-          // Nama dan Posisi
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                Text(
-                  nama,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+    return SafeArea(
+      // Tambahkan SafeArea untuk menjaga konten dari status bar
+      child: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.all(8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildProfileAvatar(),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 5),
+                  Text(
+                    nama,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  position,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                  Text(
+                    position,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-
-          // Tombol Notifikasi
-          _buildNotificationButton(),
-        ],
+            _buildNotificationButton(),
+          ],
+        ),
       ),
     );
   }

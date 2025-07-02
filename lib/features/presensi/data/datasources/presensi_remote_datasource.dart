@@ -42,15 +42,20 @@ class PresensiRemoteDatasourceImpl implements PresensiRemoteDatasource {
           checkinLng: data.checkinLng,
           status: data.status ?? 'hadir',
           batchId: data.batchId,
-          type: 'checkin', // Tambahkan type
+          type: 'checkin',
         );
       } else {
-        throw PresensiServiceException(response['message'] ?? 'Check-in gagal');
+        String message = response['message'] ?? 'Check-in gagal';
+        // Potong detail jarak dan radius jika ada
+        if (message.contains(',')) {
+          message = message.split(',').first.trim();
+        }
+        throw PresensiServiceException(message);
       }
     } on PresensiServiceException {
       rethrow;
     } catch (e) {
-      throw PresensiServiceException('Unexpected check-in error: $e');
+      throw PresensiServiceException('Terjadi kesalahan tidak terduga');
     }
   }
 

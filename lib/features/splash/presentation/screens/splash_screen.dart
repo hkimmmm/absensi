@@ -66,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
             const SizedBox(height: 16),
             const Text(
-              'CV CITRA BUANA',
+              'CV CITRA BUANA CEMELRANG',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

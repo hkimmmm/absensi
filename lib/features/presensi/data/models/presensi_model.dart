@@ -44,17 +44,16 @@ class PresensiModel extends Presensi {
       return null;
     }
     try {
-      // Parse tanggal dan kembalikan hanya tanggal untuk field 'tanggal'
-      final date = DateTime.parse(value.toString());
+      final date =
+          DateTime.parse(value.toString()).toLocal(); // Konversi ke waktu lokal
       if (fieldName == 'tanggal') {
         return DateTime(date.year, date.month, date.day);
       }
       return date;
     } catch (e) {
-      // Coba format 'yyyy-MM-dd'
       try {
         final formatter = DateFormat('yyyy-MM-dd');
-        final date = formatter.parse(value.toString());
+        final date = formatter.parse(value.toString()).toLocal();
         return DateTime(date.year, date.month, date.day);
       } catch (e2) {
         logger.e('⚠️ Invalid $fieldName format: $value, error: $e2');
@@ -149,15 +148,15 @@ class PresensiModel extends Presensi {
       logger.w(
           '⚠️ Lokasi (checkinLat, checkinLng) wajib diisi untuk status "hadir"');
     }
-    final wibTime = DateTime.now().toUtc().add(const Duration(hours: 7));
+    final now = DateTime.now().toLocal(); // Gunakan waktu lokal
     return PresensiModel(
-      tanggal: DateTime(wibTime.year, wibTime.month, wibTime.day),
-      checkinTime: wibTime,
+      tanggal: DateTime(now.year, now.month, now.day), // Hanya tanggal
+      checkinTime: now,
       checkinLat: checkinLat,
       checkinLng: checkinLng,
       status: status,
       batchId: batchId,
-      type: 'checkin', // Tambahkan field type di PresensiModel
+      type: 'checkin',
     );
   }
 

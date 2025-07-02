@@ -29,7 +29,7 @@ class PresensiRepositoryImpl implements PresensiRepository {
     } catch (e, stackTrace) {
       print(
           'PresensiRepositoryImpl: Error checkIn: $e, StackTrace: $stackTrace');
-      throw Exception('Gagal check-in: $e');
+      rethrow;
     }
   }
 
